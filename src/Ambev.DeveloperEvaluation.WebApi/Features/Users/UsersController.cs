@@ -8,6 +8,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Users.DeleteUser;
 using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
 using Ambev.DeveloperEvaluation.Application.Users.GetUser;
 using Ambev.DeveloperEvaluation.Application.Users.DeleteUser;
+using Ambev.DeveloperEvaluation.WebApi.Features.Users.ListUsers;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Users;
 
@@ -20,16 +21,25 @@ public class UsersController : BaseController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ListUsersHandler _listUsersHandler;
 
     /// <summary>
     /// Initializes a new instance of UsersController
     /// </summary>
     /// <param name="mediator">The mediator instance</param>
     /// <param name="mapper">The AutoMapper instance</param>
-    public UsersController(IMediator mediator, IMapper mapper)
+    public UsersController(IMediator mediator, IMapper mapper, ListUsersHandler listUsersHandler)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _listUsersHandler = listUsersHandler;
+    }
+
+    [HttpGet("list")]
+    public async Task<IActionResult> ListUsers([FromQuery] ListUsersRequest request)
+    {
+        var response = await _listUsersHandler.HandleAsync(request);
+        return Ok(response);
     }
 
     /// <summary>

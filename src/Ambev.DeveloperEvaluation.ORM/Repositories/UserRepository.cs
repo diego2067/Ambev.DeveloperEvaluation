@@ -72,4 +72,18 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
+
+    public async Task<IEnumerable<User>> GetAllPagedAsync(int pageNumber, int pageSize)
+    {
+        return await _context.Users
+            .OrderBy(u => u.Username)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _context.Users.CountAsync();
+    }
 }

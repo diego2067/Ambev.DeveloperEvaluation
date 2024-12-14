@@ -52,6 +52,9 @@ public class Program
 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+            builder.Services.AddDbContext<DefaultContext>(options =>
+             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));
+
             var app = builder.Build();
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
