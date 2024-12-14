@@ -10,7 +10,7 @@ public class BaseEntity : IComparable<BaseEntity>
     {
         return Validator.ValidateAsync(this);
     }
-
+    //teste commit
     public int CompareTo(BaseEntity? other)
     {
         if (other == null)
