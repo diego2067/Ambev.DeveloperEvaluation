@@ -1,16 +1,28 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Common;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
 public class Sale : BaseEntity
 {
+    [BsonId] 
+    [BsonRepresentation(BsonType.String)] 
     public new Guid Id { get; set; } = Guid.NewGuid();
+
     public required string SaleNumber { get; set; }
+
     public DateTime SaleDate { get; set; }
+
     public required string Customer { get; set; }
+
     public decimal TotalAmount { get; set; }
+
     public required string Branch { get; set; }
+
+    [BsonElement("items")] 
     public List<SaleItem> Items { get; set; } = new List<SaleItem>();
+
     public bool IsCancelled { get; set; } = false;
 
     public void CalculateTotal()
@@ -23,13 +35,21 @@ public class Sale : BaseEntity
         }
     }
 }
+
 public class SaleItem
 {
+    [BsonId] 
+    [BsonRepresentation(BsonType.String)]
     public Guid Id { get; set; } = Guid.NewGuid();
+
     public required string Product { get; set; }
+
     public int Quantity { get; set; }
+
     public decimal UnitPrice { get; set; }
+
     public decimal Discount { get; set; } = 0;
+
     public decimal Total { get; set; }
 
     public void ApplyDiscount()

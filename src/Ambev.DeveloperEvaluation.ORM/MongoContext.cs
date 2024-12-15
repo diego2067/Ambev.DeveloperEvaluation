@@ -13,5 +13,8 @@ public class MongoContext
         _database = client.GetDatabase("SalesDb");
     }
 
-    public IMongoCollection<T> GetCollection<T>(string name) => _database.GetCollection<T>(name);
+    public IMongoCollection<T> GetCollection<T>(string collectionName)
+    {
+        return _database.GetCollection<T>(collectionName);
+    }
 }
