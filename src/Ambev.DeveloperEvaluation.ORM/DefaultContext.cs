@@ -11,6 +11,8 @@ public class DefaultContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Sale> Sales { get; set; }
 
+    public DbSet<SaleItem> SaleItems { get; set; }
+
     public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
     {
     }
@@ -31,7 +33,7 @@ public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
             .Build();
 
         var builder = new DbContextOptionsBuilder<DefaultContext>();
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("PostgreSQL");
 
         builder.UseNpgsql(
                connectionString,

@@ -4,12 +4,12 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
 public class Sale : BaseEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string SaleNumber { get; set; }
+    public new Guid Id { get; set; } = Guid.NewGuid();
+    public required string SaleNumber { get; set; }
     public DateTime SaleDate { get; set; }
-    public string Customer { get; set; }
+    public required string Customer { get; set; }
     public decimal TotalAmount { get; set; }
-    public string Branch { get; set; }
+    public required string Branch { get; set; }
     public List<SaleItem> Items { get; set; } = new List<SaleItem>();
     public bool IsCancelled { get; set; } = false;
 
@@ -26,7 +26,7 @@ public class Sale : BaseEntity
 public class SaleItem
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string Product { get; set; }
+    public required string Product { get; set; }
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
     public decimal Discount { get; set; } = 0;

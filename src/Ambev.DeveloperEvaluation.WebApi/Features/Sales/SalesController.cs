@@ -74,7 +74,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             var sale = await _saleRepository.GetByIdAsync(id);
             if (sale == null) return NotFound("Sale not found.");
 
-            sale.IsCancelled = true; // Logical delete
+            sale.IsCancelled = true;
             await _saleRepository.SaveChangesAsync();
             return NoContent();
         }
@@ -97,15 +97,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
 
     public class CreateSaleRequest
     {
-        public string SaleNumber { get; set; }
-        public string Customer { get; set; }
-        public string Branch { get; set; }
-        public List<CreateSaleItemRequest> Items { get; set; }
+        public required string SaleNumber { get; set; }
+        public required string Customer { get; set; }
+        public required string Branch { get; set; }
+        public required List<CreateSaleItemRequest> Items { get; set; }
     }
 
     public class CreateSaleItemRequest
     {
-        public string Product { get; set; }
+        public required string Product { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
     }
