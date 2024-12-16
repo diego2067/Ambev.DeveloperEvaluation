@@ -1,48 +1,45 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Common;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
 public class Sale : BaseEntity
 {
-    [BsonId] 
-    [BsonRepresentation(BsonType.String)] 
     public new Guid Id { get; set; } = Guid.NewGuid();
 
-    public required string SaleNumber { get; set; }
+    public string SaleNumber { get; set; } = string.Empty;
 
     public DateTime SaleDate { get; set; }
 
-    public required string Customer { get; set; }
+    public string Customer { get; set; } = string.Empty;
 
     public decimal TotalAmount { get; set; }
 
-    public required string Branch { get; set; }
+    public string Branch { get; set; } = string.Empty;
 
-    [BsonElement("items")] 
     public List<SaleItem> Items { get; set; } = new List<SaleItem>();
 
     public bool IsCancelled { get; set; } = false;
 
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
+
     public void CalculateTotal()
     {
-        TotalAmount = 0;
-        foreach (var item in Items)
+        TotalAmount = Items.Sum(item =>
         {
             item.ApplyDiscount();
-            TotalAmount += item.Total;
-        }
+            return item.Total;
+        });
     }
 }
 
 public class SaleItem
 {
-    [BsonId] 
-    [BsonRepresentation(BsonType.String)]
+    public Guid SaleId { get; set; }
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    public required string Product { get; set; }
+    public string Product { get; set; } = string.Empty;
 
     public int Quantity { get; set; }
 
@@ -54,18 +51,13 @@ public class SaleItem
 
     public void ApplyDiscount()
     {
-        if (Quantity >= 4 && Quantity < 10)
+        Discount = Quantity switch
         {
-            Discount = 0.10m;
-        }
-        else if (Quantity >= 10 && Quantity <= 20)
-        {
-            Discount = 0.20m;
-        }
-        else if (Quantity > 20)
-        {
-            throw new InvalidOperationException("Cannot sell more than 20 identical items.");
-        }
+            >= 4 and < 10 => 0.10m,
+            >= 10 and <= 20 => 0.20m,
+            > 20 => throw new InvalidOperationException("Cannot sell more than 20 identical items."),
+            _ => 0m
+        };
 
         Total = Quantity * UnitPrice * (1 - Discount);
     }

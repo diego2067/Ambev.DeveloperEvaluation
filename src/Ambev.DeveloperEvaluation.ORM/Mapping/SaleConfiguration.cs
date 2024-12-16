@@ -14,23 +14,14 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
     public void Configure(EntityTypeBuilder<Sale> builder)
     {
         builder.HasKey(s => s.Id);
-        builder.Property(s => s.SaleNumber).IsRequired().HasMaxLength(50);
-        builder.Property(s => s.Customer).IsRequired().HasMaxLength(100);
-        builder.Property(s => s.TotalAmount).HasColumnType("decimal(18,2)");
+
+        builder.Property(s => s.RowVersion)
+               .IsRowVersion()
+               .IsConcurrencyToken();
 
         builder.HasMany(s => s.Items)
                .WithOne()
+               .HasForeignKey(i => i.SaleId)
                .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
-public class SaleItemConfiguration : IEntityTypeConfiguration<SaleItem>
-{
-    public void Configure(EntityTypeBuilder<SaleItem> builder)
-    {
-        builder.HasKey(si => si.Id);
-        builder.Property(si => si.Product).IsRequired().HasMaxLength(100);
-        builder.Property(si => si.UnitPrice).HasColumnType("decimal(18,2)");
-        builder.Property(si => si.Total).HasColumnType("decimal(18,2)");
     }
 }

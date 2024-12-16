@@ -1,5 +1,4 @@
 using Ambev.DeveloperEvaluation.Application;
-using Ambev.DeveloperEvaluation.Application.Sales;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
@@ -32,7 +31,7 @@ public class Program
 
             builder.Services.AddDbContext<DefaultContext>(options =>
                 options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    builder.Configuration.GetConnectionString("PostgreSQL"),
                     b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
                 )
             );
@@ -51,10 +50,14 @@ public class Program
                 );
             });
 
+            builder.Services.AddLogging(options =>
+            {
+                options.SetMinimumLevel(LogLevel.Debug); 
+                options.AddConsole(); 
+            });
+
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-            builder.Services.AddDbContext<DefaultContext>(options =>
-             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));
 
             var app = builder.Build();
             app.UseMiddleware<ValidationExceptionMiddleware>();

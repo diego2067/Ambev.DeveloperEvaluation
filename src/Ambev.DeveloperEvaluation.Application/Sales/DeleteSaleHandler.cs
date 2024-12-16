@@ -25,8 +25,8 @@ public class DeleteSaleHandler : IRequestHandler<DeleteSaleCommand, bool>
         
         await _sqlRepository.SaveChangesAsync();
 
-        
-        await _mongoRepository.UpdateAsync(sale.Id, sale);
+
+        await _mongoRepository.UpdateAsync(sale.Id, sale, sale.RowVersion);
 
         return true;
     }
