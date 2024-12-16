@@ -27,19 +27,9 @@ public class SaleRepository : ISaleRepository
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public void Update(Sale sale, byte[] rowVersion)
+    public void Update(Sale sale)
     {
-        _context.Sales.Attach(sale);
-        
-        _context.Entry(sale).Property(s => s.RowVersion).OriginalValue = rowVersion;
-        
-        _context.Entry(sale).Property(s => s.Customer).IsModified = true;
-        _context.Entry(sale).Property(s => s.Branch).IsModified = true;
-        
-        foreach (var item in sale.Items)
-        {
-            _context.Entry(item).State = item.Id == Guid.Empty ? EntityState.Added : EntityState.Modified;
-        }
+        _context.Entry(sale).State = EntityState.Modified;
     }
 
     public async Task SaveChangesAsync()

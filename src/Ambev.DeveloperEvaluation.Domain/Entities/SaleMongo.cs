@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
@@ -30,8 +29,9 @@ public class SaleMongo
     [BsonElement("items")]
     public List<SaleMongoItem> Items { get; set; } = new();
 
+
     [BsonElement("rowVersion")]
-    [Timestamp] 
+    [BsonSerializer(typeof(RowVersionSerializer))] 
     public byte[] RowVersion { get; set; }
 
     [BsonElement("isCancelled")]

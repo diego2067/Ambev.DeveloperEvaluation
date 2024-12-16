@@ -30,10 +30,6 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
 
         var rowVersionBytes = command.RowVersion;
 
-        if (!sale.RowVersion.SequenceEqual(rowVersionBytes))
-            throw new DbUpdateConcurrencyException("Concurrency conflict detected.");
-
-
         sale.Customer = command.Request.Customer;
         sale.Branch = command.Request.Branch;
 
@@ -48,15 +44,12 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
 
         sale.CalculateTotal();
 
-        sale.RowVersion = Guid.NewGuid().ToByteArray();
-
         try
         {
-            _sqlRepository.Update(sale, rowVersionBytes);
+            _sqlRepository.Update(sale);
             await _sqlRepository.SaveChangesAsync();
 
-
-            await _mongoRepository.UpdateAsync(sale.Id, sale, command.RowVersion);
+           await _mongoRepository.UpdateAsync(sale.Id, sale, Convert.ToBase64String(sale.RowVersion));
 
             Console.WriteLine("Atualização realizada com sucesso no SQL e MongoDB.");
             return true;

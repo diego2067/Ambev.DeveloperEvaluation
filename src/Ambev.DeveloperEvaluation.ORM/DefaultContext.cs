@@ -50,6 +50,11 @@ public class DefaultContext : DbContext
             modelBuilder.Entity<SaleMongoItem>().HasNoKey();
         });
 
+        modelBuilder.Entity<Sale>()
+       .Property(s => s.RowVersion)
+       .IsRowVersion()
+       .IsConcurrencyToken();
+
         base.OnModelCreating(modelBuilder);
 
     }

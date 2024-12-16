@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System.Linq.Expressions;
@@ -25,23 +26,24 @@ public class MongoRepository<T> where T : class
         return await _collection.Find(filter).FirstOrDefaultAsync();
     }
 
-
     public async Task<IEnumerable<T>> GetByFilterAsync(Expression<Func<T, bool>> filter)
     {
         return await _collection.Find(filter).ToListAsync();
     }
 
+    // Corrigido: Insere um documento e inicializa RowVersion apenas se for SaleMongo
     public async Task InsertAsync(T entity)
     {
         await _collection.InsertOneAsync(entity);
     }
 
-    public async Task UpdateAsync(Guid id, T entity, byte[] rowVersion)
+    // Atualiza um documento com controle de RowVersion
+    public async Task UpdateAsync(Guid id, T entity, string rowVersion)
     {
         var filter = Builders<T>.Filter.And(
-        Builders<T>.Filter.Eq("Id", id),
-        Builders<T>.Filter.Eq("RowVersion", rowVersion)
-    );
+            Builders<T>.Filter.Eq("Id", id),
+            Builders<T>.Filter.Eq("RowVersion", rowVersion)
+        );
 
         var updateResult = await _collection.ReplaceOneAsync(filter, entity);
 
@@ -55,7 +57,6 @@ public class MongoRepository<T> where T : class
         await _collection.UpdateOneAsync(filter, updateDefinition);
     }
 
-
     public async Task DeleteAsync(Guid id)
     {
         var filter = Builders<T>.Filter.Eq("Id", id);
@@ -66,6 +67,7 @@ public class MongoRepository<T> where T : class
     {
         return await _collection.CountDocumentsAsync(filter);
     }
+
     public async Task<bool> ExistsAsync(Expression<Func<T, bool>> filter)
     {
         var count = await _collection.CountDocumentsAsync(filter);

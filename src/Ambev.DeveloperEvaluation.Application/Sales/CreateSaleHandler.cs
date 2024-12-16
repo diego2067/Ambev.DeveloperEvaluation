@@ -36,9 +36,12 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
         sale.CalculateTotal();
 
-        
+        sale.RowVersion = null;
+
         await _sqlRepository.AddAsync(sale);
         await _sqlRepository.SaveChangesAsync();
+
+        var rowVersionBytes = sale.RowVersion;
 
         var mongoSale = new SaleMongo
         {
@@ -56,7 +59,8 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
                 Discount = item.Discount,
                 Total = item.Total
             }).ToList(),
-            IsCancelled = sale.IsCancelled
+            IsCancelled = sale.IsCancelled,
+            RowVersion = rowVersionBytes
         };
 
         await _mongoRepository.InsertAsync(mongoSale);
