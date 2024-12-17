@@ -21,51 +21,35 @@ public class SaleRepository : ISaleRepository
 
     public async Task<Sale> GetByIdAsync(Guid id)
     {
-        
         return await _context.Sales
-            .Include(s => s.Items)
+            .AsTracking() 
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public void Update(Sale sale)
     {
+        if (sale == null)
+            throw new ArgumentNullException(nameof(sale), "Sale entity cannot be null.");
+
         _context.Entry(sale).State = EntityState.Modified;
     }
 
     public async Task SaveChangesAsync()
     {
-        bool saveFailed;
-        do
+        try
         {
-            saveFailed = false;
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                saveFailed = true;
-
-                foreach (var entry in ex.Entries)
-                {
-                    if (entry.Entity is Sale)
-                    {
-                        var databaseValues = await entry.GetDatabaseValuesAsync();
-
-                        if (databaseValues == null)
-                        {
-                            throw new InvalidOperationException("The record no longer exists in the database.");
-                        }
-
-                        entry.OriginalValues.SetValues(databaseValues);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Concurrency conflict detected on an unexpected entity.");
-                    }
-                }
-            }
-        } while (saveFailed);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            Console.WriteLine("Concurrency conflict: " + ex.Message);
+            throw; 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error saving changes: " + ex.Message);
+            throw;
+        }
     }
 
     public async Task<IEnumerable<Sale>> GetAllPagedAsync(int pageNumber, int pageSize)
@@ -77,5 +61,8 @@ public class SaleRepository : ISaleRepository
             .Take(pageSize)
             .ToListAsync();
     }
-
+    public void SetRowVersion(Sale sale, byte[] originalRowVersion)
+    {
+        _context.Entry(sale).Property(p => p.RowVersion).OriginalValue = originalRowVersion;
+    }
 }

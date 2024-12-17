@@ -14,14 +14,12 @@ public class InfrastructureModuleInitializer : IModuleInitializer
         builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<DefaultContext>());
         
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+       
         builder.Services.AddScoped<SaleRepository>();
 
         builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoDB"));
-
         builder.Services.AddSingleton<MongoContext>();
-
         builder.Services.AddScoped<SalesMongoRepository>();
-
         builder.Services.AddTransient(typeof(MongoRepository<>), typeof(MongoRepository<>));
     }
 }

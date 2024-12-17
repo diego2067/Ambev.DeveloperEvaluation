@@ -12,7 +12,7 @@ public class BaseEntity : IComparable<BaseEntity>
     {
         return Validator.ValidateAsync(this);
     }
-   
+
     public int CompareTo(BaseEntity? other)
     {
         if (other == null)

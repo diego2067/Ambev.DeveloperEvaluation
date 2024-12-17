@@ -1,5 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System.Linq.Expressions;
@@ -31,24 +30,38 @@ public class MongoRepository<T> where T : class
         return await _collection.Find(filter).ToListAsync();
     }
 
-    // Corrigido: Insere um documento e inicializa RowVersion apenas se for SaleMongo
     public async Task InsertAsync(T entity)
     {
         await _collection.InsertOneAsync(entity);
     }
 
-    // Atualiza um documento com controle de RowVersion
     public async Task UpdateAsync(Guid id, T entity, string rowVersion)
     {
+        var idProperty = entity.GetType().GetProperty("Id");
+        if (idProperty != null && idProperty.CanWrite)
+        {
+            idProperty.SetValue(entity, id);
+        }
+
+        var rowVersionBytes = Convert.FromBase64String(rowVersion);
+
         var filter = Builders<T>.Filter.And(
             Builders<T>.Filter.Eq("Id", id),
-            Builders<T>.Filter.Eq("RowVersion", rowVersion)
+            Builders<T>.Filter.Eq("RowVersion", rowVersionBytes)
         );
 
         var updateResult = await _collection.ReplaceOneAsync(filter, entity);
 
         if (updateResult.MatchedCount == 0)
-            throw new DbUpdateConcurrencyException("Concurrency conflict detected.");
+        {
+
+            var currentDocument = await _collection.Find(Builders<T>.Filter.Eq("Id", id)).FirstOrDefaultAsync();
+
+            if (currentDocument == null)
+                throw new InvalidOperationException("The sale was deleted by another process.");
+
+            throw new InvalidOperationException("The sale was updated by another process. Please reload the data.");
+        }
     }
 
     public async Task UpdatePartialAsync(Guid id, UpdateDefinition<T> updateDefinition)

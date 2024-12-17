@@ -36,8 +36,6 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
         sale.CalculateTotal();
 
-        sale.RowVersion = null;
-
         await _sqlRepository.AddAsync(sale);
         await _sqlRepository.SaveChangesAsync();
 

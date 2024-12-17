@@ -41,22 +41,22 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
             UnitPrice = item.UnitPrice
         }).ToList();
 
-
         sale.CalculateTotal();
 
         try
         {
+            await _mongoRepository.UpdateAsync(sale.Id, sale, Convert.ToBase64String(sale.RowVersion));
+
+            _sqlRepository.SetRowVersion(sale, sale.RowVersion);
+
             _sqlRepository.Update(sale);
             await _sqlRepository.SaveChangesAsync();
-
-           await _mongoRepository.UpdateAsync(sale.Id, sale, Convert.ToBase64String(sale.RowVersion));
 
             Console.WriteLine("Atualização realizada com sucesso no SQL e MongoDB.");
             return true;
         }
         catch (DbUpdateConcurrencyException)
         {
-
             Console.WriteLine("A venda foi modificada ou removida por outro processo.");
             throw new InvalidOperationException("The sale was updated or deleted by another process.");
         }
