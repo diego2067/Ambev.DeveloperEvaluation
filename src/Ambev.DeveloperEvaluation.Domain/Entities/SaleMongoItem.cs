@@ -20,6 +20,8 @@ public class SaleMongoItem
     [BsonElement("total")]
     public decimal Total { get;  set; }
 
+    [BsonElement("totalAmount")]
+    public decimal TotalAmount { get; set; }
     public void ApplyDiscount()
     {
         Discount = Quantity switch

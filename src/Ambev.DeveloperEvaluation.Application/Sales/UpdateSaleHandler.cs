@@ -20,7 +20,6 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
 
     public async Task<bool> Handle(UpdateSaleCommand command, CancellationToken cancellationToken)
     {
-
         var sale = await _sqlRepository.GetByIdAsync(command.SaleId);
         if (sale == null)
             throw new InvalidOperationException("Sale not found.");
@@ -34,7 +33,6 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
         sale.Customer = command.Request.Customer;
         sale.Branch = command.Request.Branch;
 
-
         sale.Items = command.Request.Items.Select(item => new SaleItem
         {
             Product = item.Product,
@@ -46,6 +44,9 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
 
         try
         {
+            _sqlRepository.Update(sale);
+            await _sqlRepository.SaveChangesAsync();
+
             var saleMongo = await _mongoRepository.GetByIdAsync(command.SaleId);
 
             if (saleMongo == null) return false;
@@ -53,20 +54,24 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
             saleMongo.Customer = command.Request.Customer;
             saleMongo.Branch = command.Request.Branch;
 
-            saleMongo.Items = command.Request.Items.Select(item => new SaleMongoItem
+            saleMongo.Items = command.Request.Items.Select(item =>
             {
-                Product = item.Product,
-                Quantity = item.Quantity,
-                UnitPrice = item.UnitPrice
+                var saleItem = new SaleMongoItem
+                {
+                    Product = item.Product,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice
+                };
+
+                saleItem.ApplyDiscount();
+                return saleItem;
             }).ToList();
+
+            saleMongo.TotalAmount = saleMongo.Items.Sum(i => i.Total);
 
             await _mongoRepository.UpdateAsync(sale.Id, saleMongo, Convert.ToBase64String(sale.RowVersion));
 
             _sqlRepository.SetRowVersion(sale, sale.RowVersion);
-
-            _sqlRepository.Update(sale);
-            await _sqlRepository.SaveChangesAsync();
-
             Console.WriteLine("Atualização realizada com sucesso no SQL e MongoDB.");
             return true;
         }
