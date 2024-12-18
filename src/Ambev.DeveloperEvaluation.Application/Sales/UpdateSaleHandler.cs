@@ -3,6 +3,7 @@ using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales;
 
@@ -45,7 +46,21 @@ public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, bool>
 
         try
         {
-            await _mongoRepository.UpdateAsync(sale.Id, sale, Convert.ToBase64String(sale.RowVersion));
+            var saleMongo = await _mongoRepository.GetByIdAsync(command.SaleId);
+
+            if (saleMongo == null) return false;
+
+            saleMongo.Customer = command.Request.Customer;
+            saleMongo.Branch = command.Request.Branch;
+
+            saleMongo.Items = command.Request.Items.Select(item => new SaleMongoItem
+            {
+                Product = item.Product,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice
+            }).ToList();
+
+            await _mongoRepository.UpdateAsync(sale.Id, saleMongo, Convert.ToBase64String(sale.RowVersion));
 
             _sqlRepository.SetRowVersion(sale, sale.RowVersion);
 

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
 
-public class SalesMongoRepository : MongoRepository<Sale>
+public class SalesMongoRepository : MongoRepository<SaleMongo>
 {
     public SalesMongoRepository(MongoContext context, IOptions<MongoSettings> settings)
         : base(context, settings)

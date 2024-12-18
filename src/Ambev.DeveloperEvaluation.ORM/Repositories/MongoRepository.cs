@@ -21,7 +21,7 @@ public class MongoRepository<T> where T : class
 
     public async Task<T> GetByIdAsync(Guid id)
     {
-        var filter = Builders<T>.Filter.Eq("Id", id);
+        var filter = Builders<T>.Filter.Eq("_id", id.ToString());
         return await _collection.Find(filter).FirstOrDefaultAsync();
     }
 
@@ -37,24 +37,34 @@ public class MongoRepository<T> where T : class
 
     public async Task UpdateAsync(Guid id, T entity, string rowVersion)
     {
+        
         var idProperty = entity.GetType().GetProperty("Id");
         if (idProperty != null && idProperty.CanWrite)
         {
             idProperty.SetValue(entity, id);
         }
 
+       
         var rowVersionBytes = Convert.FromBase64String(rowVersion);
 
+       
+        var rowVersionProperty = entity.GetType().GetProperty("RowVersion");
+        if (rowVersionProperty != null && rowVersionProperty.CanWrite)
+        {
+            rowVersionProperty.SetValue(entity, Guid.NewGuid().ToByteArray());
+        }
+
+        
         var filter = Builders<T>.Filter.And(
-            Builders<T>.Filter.Eq("Id", id),
-            Builders<T>.Filter.Eq("RowVersion", rowVersionBytes)
+            Builders<T>.Filter.Eq("Id", id)
         );
 
+        
         var updateResult = await _collection.ReplaceOneAsync(filter, entity);
 
+        
         if (updateResult.MatchedCount == 0)
         {
-
             var currentDocument = await _collection.Find(Builders<T>.Filter.Eq("Id", id)).FirstOrDefaultAsync();
 
             if (currentDocument == null)
