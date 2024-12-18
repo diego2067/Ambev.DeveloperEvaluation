@@ -22,17 +22,5 @@ public class SaleMongoItem
 
     [BsonElement("totalAmount")]
     public decimal TotalAmount { get; set; }
-    public void ApplyDiscount()
-    {
-        Discount = Quantity switch
-        {
-            >= 4 and < 10 => 0.10m,
-            >= 10 and <= 20 => 0.20m,
-            > 20 => throw new InvalidOperationException("Cannot sell more than 20 identical items."),
-            _ => 0m
-        };
-
-        Total = Quantity * UnitPrice * (1 - Discount);
-    }
 }
 

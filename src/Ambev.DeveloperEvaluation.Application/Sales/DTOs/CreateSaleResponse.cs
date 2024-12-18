@@ -7,5 +7,4 @@ public class CreateSaleResponse
     public required string Customer { get; set; }
     public required string Branch { get; set; }
     public required decimal TotalAmount { get; set; }
-    public required string RowVersion { get; set; } 
 }

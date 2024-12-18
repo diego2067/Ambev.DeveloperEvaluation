@@ -15,10 +15,6 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
     {
         builder.HasKey(s => s.Id);
 
-        builder.Property(s => s.RowVersion)
-               .IsRowVersion()
-               .IsConcurrencyToken();
-
         builder.HasMany(s => s.Items)
                .WithOne()
                .HasForeignKey(i => i.SaleId)

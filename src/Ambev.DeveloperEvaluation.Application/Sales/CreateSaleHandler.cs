@@ -19,6 +19,39 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
     public async Task<CreateSaleResponse> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
     {
+        Sale sale;
+
+        try
+        {
+            sale = await CreateSaleInSqlAsync(request);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao inserir no SQL Server: {ex.Message}");
+            throw new InvalidOperationException("Falha ao criar a venda no SQL Server.", ex);
+        }
+
+        try
+        {
+            await CreateSaleInMongoAsync(sale);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao inserir no MongoDB: {ex.Message}");
+            throw new InvalidOperationException("Falha ao criar a venda no MongoDB. A operação no SQL foi bem-sucedida.", ex);
+        }
+
+        return new CreateSaleResponse
+        {
+            Id = sale.Id,
+            SaleNumber = sale.SaleNumber,
+            Customer = sale.Customer,
+            Branch = sale.Branch,
+            TotalAmount = sale.TotalAmount
+        };
+    }
+    private async Task<Sale> CreateSaleInSqlAsync(CreateSaleCommand request)
+    {
         var sale = new Sale
         {
             Id = Guid.NewGuid(),
@@ -26,11 +59,17 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
             SaleDate = DateTime.UtcNow,
             Customer = request.Request.Customer,
             Branch = request.Request.Branch,
-            Items = request.Request.Items.Select(item => new SaleItem
+            Items = request.Request.Items.Select(item =>
             {
-                Product = item.Product,
-                Quantity = item.Quantity,
-                UnitPrice = item.UnitPrice
+                var saleItem = new SaleItem
+                {
+                    Product = item.Product,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice
+                };
+
+                saleItem.ApplyDiscount();
+                return saleItem;
             }).ToList()
         };
 
@@ -39,8 +78,11 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
         await _sqlRepository.AddAsync(sale);
         await _sqlRepository.SaveChangesAsync();
 
-        var rowVersionBytes = sale.RowVersion;
+        return sale;
+    }
 
+    private async Task CreateSaleInMongoAsync(Sale sale)
+    {
         var mongoSale = new SaleMongo
         {
             Id = sale.Id,
@@ -57,23 +99,10 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
                 Discount = item.Discount,
                 Total = item.Total
             }).ToList(),
-            IsCancelled = sale.IsCancelled,
-            RowVersion = rowVersionBytes
+            IsCancelled = sale.IsCancelled
         };
 
         await _mongoRepository.InsertAsync(mongoSale);
-
-              Console.WriteLine("RowVersion atual no banco: " + Convert.ToBase64String(sale.RowVersion));
-        var rowVersionBase64 = Convert.ToBase64String(sale.RowVersion);
-
-        return new CreateSaleResponse
-        {
-            Id = sale.Id,
-            SaleNumber = sale.SaleNumber,
-            Customer = sale.Customer,
-            Branch = sale.Branch,
-            TotalAmount = sale.TotalAmount,
-            RowVersion = rowVersionBase64
-        };
+        Console.WriteLine("MongoDB inserido com sucesso.");
     }
 }

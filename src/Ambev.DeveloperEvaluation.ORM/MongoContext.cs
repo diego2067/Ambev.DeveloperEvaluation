@@ -10,7 +10,6 @@ public class MongoContext
 
     public MongoContext(IOptions<MongoSettings> settings, IConfiguration configuration)
     {
-        // Obter a string de conexão da seção "ConnectionStrings:MongoDB"
         var connectionString = configuration.GetConnectionString("MongoDB");
         if (string.IsNullOrEmpty(connectionString))
             throw new ArgumentNullException(nameof(connectionString), "A string de conexão do MongoDB não pode ser nula.");

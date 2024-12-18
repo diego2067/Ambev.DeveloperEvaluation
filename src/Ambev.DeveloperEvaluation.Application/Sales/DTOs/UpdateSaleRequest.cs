@@ -4,8 +4,8 @@ public class UpdateSaleRequest
 {
     public required string Customer { get; set; }
     public required string Branch { get; set; }
+
     public required List<UpdateSaleItemRequest> Items { get; set; }
-    public  string RowVersion { get; set; }
 }
 public class UpdateSaleItemRequest
 {

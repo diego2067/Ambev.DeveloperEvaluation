@@ -35,7 +35,7 @@ public class MongoRepository<T> where T : class
         await _collection.InsertOneAsync(entity);
     }
 
-    public async Task UpdateAsync(Guid id, T entity, string rowVersion)
+    public async Task UpdateAsync(Guid id, T entity)
     {
         
         var idProperty = entity.GetType().GetProperty("Id");
@@ -43,18 +43,7 @@ public class MongoRepository<T> where T : class
         {
             idProperty.SetValue(entity, id);
         }
-
        
-        var rowVersionBytes = Convert.FromBase64String(rowVersion);
-
-       
-        var rowVersionProperty = entity.GetType().GetProperty("RowVersion");
-        if (rowVersionProperty != null && rowVersionProperty.CanWrite)
-        {
-            rowVersionProperty.SetValue(entity, Guid.NewGuid().ToByteArray());
-        }
-
-        
         var filter = Builders<T>.Filter.And(
             Builders<T>.Filter.Eq("Id", id)
         );

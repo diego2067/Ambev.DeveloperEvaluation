@@ -29,20 +29,6 @@ public class SaleMongo
     [BsonElement("items")]
     public List<SaleMongoItem> Items { get; set; } = new();
 
-
-    [BsonElement("rowVersion")]
-    [BsonSerializer(typeof(RowVersionSerializer))] 
-    public byte[] RowVersion { get; set; }
-
     [BsonElement("isCancelled")]
     public bool IsCancelled { get; set; } = false;
-
-    public void CalculateTotal()
-    {
-        TotalAmount = Items.Sum(item =>
-        {
-            item.ApplyDiscount();
-            return item.Total;
-        });
-    }
 }
