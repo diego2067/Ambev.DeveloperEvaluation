@@ -1,0 +1,13 @@
+.text-success {
+  color: green;
+  font-weight: bold;
+}
+
+.text-danger {
+  color: red;
+  font-weight: bold;
+}
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

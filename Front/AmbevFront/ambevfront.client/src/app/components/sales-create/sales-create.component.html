@@ -1,0 +1,69 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Criar Nova Venda</h2>
+ 
+  <form>
+   
+    <div class="mb-3">
+      <label for="customer" class="form-label">Comprador</label>
+      <input type="text"
+             class="form-control"
+             id="customer"
+             [(ngModel)]="newSale.customer"
+             name="customer"
+             placeholder="Digite o nome do comprador" />
+    </div>
+   
+    <div class="mb-3">
+      <label for="branch" class="form-label">Filial</label>
+      <input type="text"
+             class="form-control"
+             id="branch"
+             [(ngModel)]="newSale.branch"
+             name="branch"
+             placeholder="Digite o nome da filial" />
+    </div>
+
+    <h5 class="mt-4">Itens</h5>
+    <div *ngFor="let item of newSale.items; let i = index" class="mb-3 border rounded p-3">
+     
+      <div class="mb-2">
+        <label for="product{{i}}" class="form-label">Produto</label>
+        <input type="text"
+               class="form-control"
+               id="product{{i}}"
+               [(ngModel)]="item.product"
+               name="product{{i}}"
+               placeholder="Digite o nome do produto" />
+      </div>
+
+      <div class="mb-2">
+        <label for="quantity{{i}}" class="form-label">Quantidade</label>
+        <input type="number"
+               class="form-control"
+               id="quantity{{i}}"
+               [(ngModel)]="item.quantity"
+               name="quantity{{i}}"
+               placeholder="Digite a quantidade" />
+      </div>
+
+      <div class="mb-2">
+        <label for="unitPrice{{i}}" class="form-label">Preço Unitário</label>
+        <input type="number"
+               class="form-control"
+               id="unitPrice{{i}}"
+               [(ngModel)]="item.unitPrice"
+               name="unitPrice{{i}}"
+               placeholder="Digite o preço unitário" />
+      </div>
+    </div>
+    
+    <div class="mb-3">
+      <button type="button" class="btn btn-secondary" (click)="addItem()">Adicionar Item</button>
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <button type="button" class="btn btn-secondary me-2" (click)="resetForm()">Cancelar</button>
+      <button type="button" class="btn btn-primary" (click)="saveSale()">Salvar</button>
+    </div>
+  </form>
+</div>

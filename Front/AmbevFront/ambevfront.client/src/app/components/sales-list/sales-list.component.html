@@ -1,0 +1,93 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Lista de Vendas</h2>
+
+  
+  <table class="table table-striped table-bordered text-center">
+    <thead class="table-dark">
+      <tr>
+        <th>Número da Venda</th>
+        <th>Data</th>
+        <th>Total</th>
+        <th>Comprador</th>
+        <th>Filial</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let sale of sales">
+        <td>
+          <a href="javascript:void(0)" (click)="showProducts(sale.id, productsModal)" class="text-primary">
+            {{ sale.saleNumber }}
+          </a>
+        </td>
+        <td>{{ sale.saleDate | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ sale.totalAmount | currency: 'BRL' }}</td>
+        <td>{{ sale.customer }}</td>
+        <td>{{ sale.branch }}</td>
+        <td>
+          <span *ngIf="sale.isCancelled" class="text-danger">Cancelada</span>
+          <span *ngIf="!sale.isCancelled" class="text-success">Ativa</span>
+        </td>
+        <td>
+          <button class="btn btn-warning btn-sm me-2" (click)="editSale(sale.id, editModal)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteSale(sale.id)">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #productsModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Produtos da Venda</h5>
+      <button type="button" class="btn-close" (click)="modal.close()"></button>
+    </div>
+    <div class="modal-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of products">
+            <td>{{ item.product }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice | currency: 'BRL' }}</td>
+            <td>{{ (item.quantity * item.unitPrice) | currency: 'BRL' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
+  <ng-template #editModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Editar Venda</h5>
+      <button type="button" class="btn-close" (click)="modal.close()"></button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <label>Comprador</label>
+        <input type="text" class="form-control mb-2" [(ngModel)]="selectedSale.customer" name="customer" />
+        <label>Filial</label>
+        <input type="text" class="form-control mb-2" [(ngModel)]="selectedSale.branch" name="branch" />
+
+        <h5>Itens</h5>
+        <div *ngFor="let item of selectedSale.items; let i = index">
+          <label>Produto</label>
+          <input type="text" class="form-control mb-2" [(ngModel)]="item.product" name="product{{i}}" />
+          <label>Quantidade</label>
+          <input type="number" class="form-control mb-2" [(ngModel)]="item.quantity" name="quantity{{i}}" />
+          <label>Preço Unitário</label>
+          <input type="number" class="form-control mb-2" [(ngModel)]="item.unitPrice" name="unitPrice{{i}}" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modal.close()">Cancelar</button>
+      <button class="btn btn-primary" (click)="updateSale(modal)">Salvar</button>
+    </div>
+  </ng-template>
+</div>

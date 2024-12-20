@@ -1,0 +1,1 @@
+C:\ProjetoAMBEV\template\front\AmbevFront\ambevfront.client\obj\Debug\ambevfront.client.esproj.CoreCompileInputs.cache

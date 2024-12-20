@@ -1,0 +1,24 @@
+{
+  "Version": 1,
+  "Hash": "mvFIGL8NV3WOJORDfGh1H9GcKQQz14QOLUVJr/6Md3Q=",
+  "Source": "AmbevFront.Server",
+  "BasePath": "_content/AmbevFront.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\ProjetoAMBEV\\template\\front\\AmbevFront\\ambevfront.client\\ambevfront.client.esproj",
+      "Version": 2,
+      "Source": "ambevfront.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    }
+  ],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

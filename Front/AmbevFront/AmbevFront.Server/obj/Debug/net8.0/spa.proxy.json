@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:62998",
+"RedirectUrl": "",
+"LaunchCommand": "npm start",
+"WorkingDirectory": "C:\\ProjetoAMBEV\\template\\front\\AmbevFront\\AmbevFront.Server\\..\\ambevfront.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}
