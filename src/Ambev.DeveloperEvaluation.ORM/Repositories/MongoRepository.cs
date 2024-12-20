@@ -11,7 +11,7 @@ public class MongoRepository<T> where T : class
 
     public MongoRepository(MongoContext context, IOptions<MongoSettings> settings)
     {
-        _collection = context.GetCollection<T>(settings.Value.CollectionName);
+       _collection = context.GetCollection<T>(settings.Value.CollectionName);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
