@@ -23,4 +23,3 @@ public class SaleMongoItem
     [BsonElement("totalAmount")]
     public decimal TotalAmount { get; set; }
 }
-

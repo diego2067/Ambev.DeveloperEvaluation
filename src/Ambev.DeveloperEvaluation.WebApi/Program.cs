@@ -41,6 +41,15 @@ public class Program
             );
 
             
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", policy =>
+                {
+                    policy.AllowAnyOrigin()    
+                          .AllowAnyMethod()    
+                          .AllowAnyHeader();   
+                });
+            });
 
             BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
@@ -77,6 +86,8 @@ public class Program
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthentication();
             app.UseAuthorization();
